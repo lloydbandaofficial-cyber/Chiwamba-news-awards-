@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0d0d0d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chiwamba Awards">
 <title>Chiwamba Awards 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;800;900&display=swap" rel="stylesheet">
@@ -53,6 +58,7 @@ fieldset{border:0;padding:0;margin:0}
 .bar{height:10px;background:#e6dfcc;border-radius:99px;margin-top:4px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--red);border-radius:99px}
 .row.lead .bar i{background:var(--gold)}
+#inst button{width:auto;margin-top:10px;padding:10px 22px;background:var(--gold);color:var(--black)}
 footer{background:var(--black);color:#fff;text-align:center;padding:18px;font-size:.9rem;border-top:4px solid var(--red)}
 @media (max-width:520px){.hero{flex-direction:column;gap:10px}.hero img{height:140px;order:2}}
 </style>
@@ -70,11 +76,11 @@ footer{background:var(--black);color:#fff;text-align:center;padding:18px;font-si
 </div>
 <nav id="nav" hidden></nav>
 <main id="app"></main>
-<footer>Chiwamba News Awards 2026</footer>
+<footer>Chiwamba News Awards 2026<div id="inst" hidden><button id="instBtn" type="button">Install the app</button><p id="iosHint" class="hint" hidden style="color:#fff">On iPhone: tap Share, then Add to Home Screen.</p></div></footer>
 
 <script>
 // PASTE YOUR APPS SCRIPT WEB APP URL HERE
-const API_URL = "https://script.google.com/macros/s/AKfycbxAJoeHJm-q-LtGSt2Y4-MqlZFtGAtLnd8jb1Fb4YIxeiXcSO1xN_BQ2Gad_hl3i07PRg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwXKQlFAgJKC5R-Hz30RSJV-ZQUFlzm5o0EAzM241XQwMI5nc5jkvzvMqXbGSX7ZSankw/exec";
 
 const app = document.getElementById("app");
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -212,6 +218,12 @@ async function resultsView() {
       <p class="hint">${c.total} vote${c.total === 1 ? "" : "s"} in this category</p></section>`).join("");
   } catch { app.innerHTML = '<div class="card msg err">Could not load results. Refresh and try again.</div>'; }
 }
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+let ev;
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); ev = e; if (!standalone) document.getElementById("inst").hidden = false; });
+document.getElementById("instBtn").onclick = async () => { if (ev) { ev.prompt(); await ev.userChoice; ev = null; document.getElementById("inst").hidden = true; } };
+if (/iphone|ipad/i.test(navigator.userAgent) && !standalone) { document.getElementById("inst").hidden = false; document.getElementById("instBtn").hidden = true; document.getElementById("iosHint").hidden = false; }
 load();
 </script>
 </body>
